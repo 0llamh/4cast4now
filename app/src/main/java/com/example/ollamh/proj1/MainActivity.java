@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    protected int getTemperature(String state, String city) throws JSONException {
+    protected String getTemperature(String state, String city) throws JSONException {
         // Given State & City, we can hit our API
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json"; // + STATE_NAME/CITY_NAME.json"
         JSONObject api = new JSONObject(API_URL);
