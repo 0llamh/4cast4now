@@ -53,7 +53,7 @@ public class notificationReceiver extends BroadcastReceiver {
                     .setContentTitle(title)
                     .setContentText(description)
                     .setTicker("Severe Weather Alert")
-                    .setSmallIcon(R.drawable.ic_weather_alert);
+                    .setSmallIcon(R.drawable.ic_stat_name);
 
             notificationBuilder.setContentIntent(pendingIntent);
 
