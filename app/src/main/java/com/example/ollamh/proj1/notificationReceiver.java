@@ -46,8 +46,6 @@ public class notificationReceiver extends BroadcastReceiver {
                     .setTicker("Severe Weather Alert")
                     .setSmallIcon(R.drawable.ic_stat_name);
 
-
-
             notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
             notificationBuilder.setAutoCancel(true);
 
