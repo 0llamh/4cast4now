@@ -95,34 +95,6 @@ public class MainActivity extends AppCompatActivity {
         return json.getJSONObject("current_observation").getString("dewpoint_f") + "°";
     }
 
-
-//    public static JSONObject getJSONfromURL(String url){
-//        initializeInputStream is = null;
-//         String result = "";
-//         JSONObject jArray = null;
-//         http posttry {
-//             HttpClient httpclient = new DefaultHttpClient();
-//             HttpPost httppost = new HttpPost(url);
-//             HttpResponse response = httpclient.execute(httppost);
-//             HttpEntity entity = response.getEntity();is = entity.getContent();
-//         }
-//         catch(Exception e){
-//         Log.e("log_tag", "Error in http connection "+e.toString());
-//         } //convert response to stringtry{BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
-//         StringBuilder sb = new StringBuilder();
-//         String line = null;
-//         while ((line = reader.readLine()) != null) {
-//             sb.append(line + "\n");}is.close();
-//             result=sb.toString();
-//         }catch(Exception e){Log.e("log_tag", "Error converting result "+e.toString());
-//         }
-//         try parse the string to a JSON objecttry{
-//         jArray = new JSONObject(result);}catch(JSONException e){
-//         Log.e("log_tag", "Error parsing data "+e.toString());
-//         }
-//         return jArray;}
-//    }
-
     public void sendIntent(){
 
         Intent intent = new Intent();
