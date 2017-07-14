@@ -39,31 +39,26 @@ public class notificationReceiver extends BroadcastReceiver {
         }
 
 
-        //https://stackoverflow.com/questions/11434056/how-to-run-a-method-every-x-seconds
-
-            Date time = new Date(System.currentTimeMillis());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-            AlarmManager interval = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-            interval.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-
-            String title = translate();
-            NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                    .setContentTitle(title)
-                    .setContentText(description)
-                    .setTicker("Severe Weather Alert")
-                    .setSmallIcon(R.drawable.ic_stat_name);
-
-            notificationBuilder.setContentIntent(pendingIntent);
 
 
-            notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
-            notificationBuilder.setAutoCancel(true);
 
-            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            manager.notify(1, notificationBuilder.build());
 
+    if(isAlert>0) {
+        String title = translate();
+        NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                .setContentTitle(title)
+                .setContentText(description)
+                .setTicker("Severe Weather Alert")
+                .setSmallIcon(R.drawable.ic_stat_name);
+
+
+
+        notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
+        notificationBuilder.setAutoCancel(true);
+
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(1, notificationBuilder.build());
+   }
 
 
 

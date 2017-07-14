@@ -64,16 +64,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendIntent(){
 
-
-
         Intent intent = new Intent();
         intent.setAction("com.example.ollamh.proj1");
         intent.putExtra("state",state);
         intent.putExtra("city",city);
 
+        Date time = new Date(System.currentTimeMillis());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
+        AlarmManager interval = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        sendBroadcast(intent);
+        interval.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+
 
     }
 }
