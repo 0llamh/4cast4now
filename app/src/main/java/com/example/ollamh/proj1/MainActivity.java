@@ -11,9 +11,21 @@ import android.support.v7.app.NotificationCompat;
 import android.view.View;
 import android.widget.TextView;
 import android.content.Intent;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 import org.json.*;
+import com.google.code.gson;
+import org.w3c.dom.Text;
+
 import android.app.NotificationManager;
 
 import static android.app.TaskStackBuilder.create;
@@ -21,9 +33,8 @@ import static android.app.TaskStackBuilder.create;
 
 public class MainActivity extends AppCompatActivity {
     GifView gifView;
-    TextView temperatureView;
-    String state="Fairfax";
-    String city="Virginia";
+    TextView temperatureView, locationText, dateText;
+    String state, city;
 
     final private String API_KEY = "3b7b12e3bec57d6c";
     private String API_URL;
@@ -37,30 +48,92 @@ public class MainActivity extends AppCompatActivity {
 
         gifView = (GifView) findViewById(R.id.gef_view);
         temperatureView = (TextView) findViewById(R.id.temperature);
+        locationText = (TextView) findViewById(R.id.location);
+        dateText = (TextView) findViewById(R.id.date);
 
-        try {
-            temperatureView.setText(getTemperature(state,city));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         // TODO: GET STATE & CITY STRING VALUES
-        //      then, pass into getTemperature(state, city) function
-        //
-        // temperatureView.setText(getTemperature(state, city));
+        state="Virginia";
+        city="Fairfax";
+        locationText.setText(city + ", " + state);
+
+        // TODO: Get Date & Set TextView accordingly
+
+        // Pass Location into getTemperature(state, city) function
+        try {
+            temperatureView.setText(getTemperature(state,city));
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+        }
 
         sendIntent();
     }
 
-    protected String getTemperature(String state, String city) throws JSONException {
+    protected String getTemperature(String state, String city) throws JSONException, IOException {
         // Given State & City, we can hit our API
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json"; // + STATE_NAME/CITY_NAME.json"
-        JSONObject api = new JSONObject(API_URL);
-        return api.getJSONObject("current_observations").getString("temp_f");
+//        JSONObject api = urlToJSON(API_URL);
+
+        // Connect to the URL using java's native library
+        URL url = new URL(API_URL);
+        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+        request.connect();
+
+        // Convert to a JSON object to print data
+        JSONParser jp = new JsonParser(); //from gson
+        JSONElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+        JSONObject api = root.getAsJsonObject(); //May be an array, may be an object.
+        zipcode = rootobj.get("zip_code").getAsString(); //just grab the zipcode
+
+        String temp = api.getJSONObject("current_observation").getString("temp_f") + "°";
+        return temp;
     }
 
+//    public static JSONObject getJSONfromURL(String url){
+//        initializeInputStream is = null;
+//         String result = "";
+//         JSONObject jArray = null;
+//         http posttry {
+//             HttpClient httpclient = new DefaultHttpClient();
+//             HttpPost httppost = new HttpPost(url);
+//             HttpResponse response = httpclient.execute(httppost);
+//             HttpEntity entity = response.getEntity();is = entity.getContent();
+//         }
+//         catch(Exception e){
+//         Log.e("log_tag", "Error in http connection "+e.toString());
+//         } //convert response to stringtry{BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+//         StringBuilder sb = new StringBuilder();
+//         String line = null;
+//         while ((line = reader.readLine()) != null) {
+//             sb.append(line + "\n");}is.close();
+//             result=sb.toString();
+//         }catch(Exception e){Log.e("log_tag", "Error converting result "+e.toString());
+//         }
+//         try parse the string to a JSON objecttry{
+//         jArray = new JSONObject(result);}catch(JSONException e){
+//         Log.e("log_tag", "Error parsing data "+e.toString());
+//         }
+//         return jArray;}
+//    }
 
+    private static String readBuffer(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
 
+    public static JSONObject urlToJSON (String url) throws IOException, JSONException{
+        InputStream is = new URL(url).openStream();
+        try {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            return new JSONObject(readBuffer(rd));
+        } finally {
+            is.close();
+        }
+    }
 
     public void sendIntent(){
 

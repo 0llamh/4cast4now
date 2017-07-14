@@ -38,30 +38,22 @@ public class notificationReceiver extends BroadcastReceiver {
             e.printStackTrace();
         }
 
+        if(isAlert>0) {
+            String title = translate();
+            NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                    .setContentTitle(title)
+                    .setContentText(description)
+                    .setTicker("Severe Weather Alert")
+                    .setSmallIcon(R.drawable.ic_stat_name);
 
 
 
+            notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
+            notificationBuilder.setAutoCancel(true);
 
-
-    if(isAlert>0) {
-        String title = translate();
-        NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                .setContentTitle(title)
-                .setContentText(description)
-                .setTicker("Severe Weather Alert")
-                .setSmallIcon(R.drawable.ic_stat_name);
-
-
-
-        notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
-        notificationBuilder.setAutoCancel(true);
-
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(1, notificationBuilder.build());
-   }
-
-
-
+            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.notify(1, notificationBuilder.build());
+       }
 
     }
 
@@ -76,14 +68,12 @@ public class notificationReceiver extends BroadcastReceiver {
         description=api.getJSONObject("alerts").getString("message");
         return api.getJSONObject("alerts").getString("type");
 
-
     }
 
 
     String translate() {
 
-                String weather = severeWeather;
-
+        String weather = severeWeather;
         switch (severeWeather) {
             case "HUR":
                 weather="New Hurricane Local Statement";
@@ -134,5 +124,5 @@ public class notificationReceiver extends BroadcastReceiver {
         return weather;
     }
 
-    }
+}
 
