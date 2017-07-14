@@ -5,9 +5,11 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.icu.util.GregorianCalendar;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
+import android.util.JsonReader;
 import android.view.View;
 import android.widget.TextView;
 import android.content.Intent;
@@ -17,27 +19,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.util.Date;
 
 import org.json.*;
-import com.google.code.gson;
-import org.w3c.dom.Text;
 
 import android.app.NotificationManager;
+import android.widget.Toast;
 
 import static android.app.TaskStackBuilder.create;
 
 
 public class MainActivity extends AppCompatActivity {
     GifView gifView;
-    TextView temperatureView, locationText, dateText;
+    TextView locationText, dateText, temperatureView, realFeelView, dewPointView;
     String state, city;
 
     final private String API_KEY = "3b7b12e3bec57d6c";
     private String API_URL;
+    private static String JSON_STRING;
 
     NotificationManager notificationManager;
 
@@ -46,48 +48,53 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        JsonFromURLTask task = new JsonFromURLTask();
+
         gifView = (GifView) findViewById(R.id.gef_view);
         temperatureView = (TextView) findViewById(R.id.temperature);
         locationText = (TextView) findViewById(R.id.location);
         dateText = (TextView) findViewById(R.id.date);
+        realFeelView = (TextView) findViewById(R.id.realfeelNumber);
+        dewPointView = (TextView) findViewById(R.id.dewpointNumber);
 
 
         // TODO: GET STATE & CITY STRING VALUES
-        state="Virginia";
+        state="va";
         city="Fairfax";
-        locationText.setText(city + ", " + state);
+        locationText.setText(city + ", " + state.toUpperCase());
+        API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
+        task.execute(new String[] {API_URL});
 
-        // TODO: Get Date & Set TextView accordingly
+        // Get Date & Set TextView accordingly
+        dateText.setText(DateFormat.getDateInstance().format(new Date()));
 
         // Pass Location into getTemperature(state, city) function
-        try {
-            temperatureView.setText(getTemperature(state,city));
-        } catch (JSONException | IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            temperatureView.setText(getTemperature(API_URL));
+//        } catch (JSONException | IOException e) {
+//            Toast.makeText(this, "JSON Error", Toast.LENGTH_SHORT).show();
+//            e.printStackTrace();
+//        }
 
         sendIntent();
     }
 
-    protected String getTemperature(String state, String city) throws JSONException, IOException {
+    protected String getTemperature(String jsonstring) throws JSONException, IOException {
         // Given State & City, we can hit our API
-        API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json"; // + STATE_NAME/CITY_NAME.json"
-//        JSONObject api = urlToJSON(API_URL);
-
-        // Connect to the URL using java's native library
-        URL url = new URL(API_URL);
-        HttpURLConnection request = (HttpURLConnection) url.openConnection();
-        request.connect();
-
-        // Convert to a JSON object to print data
-        JSONParser jp = new JsonParser(); //from gson
-        JSONElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-        JSONObject api = root.getAsJsonObject(); //May be an array, may be an object.
-        zipcode = rootobj.get("zip_code").getAsString(); //just grab the zipcode
-
-        String temp = api.getJSONObject("current_observation").getString("temp_f") + "°";
-        return temp;
+        JSONObject json = new JSONObject(jsonstring);
+        return json.getJSONObject("current_observation").getString("temp_f") + "°";
     }
+    protected String getRealFeel(String jsonstring) throws JSONException, IOException {
+        // Given State & City, we can hit our API
+        JSONObject json = new JSONObject(jsonstring);
+        return json.getJSONObject("current_observation").getString("feelslike_f") + "°";
+    }
+    protected String getDewPoint(String jsonstring) throws JSONException, IOException {
+        // Given State & City, we can hit our API
+        JSONObject json = new JSONObject(jsonstring);
+        return json.getJSONObject("current_observation").getString("dewpoint_f") + "°";
+    }
+
 
 //    public static JSONObject getJSONfromURL(String url){
 //        initializeInputStream is = null;
@@ -116,25 +123,6 @@ public class MainActivity extends AppCompatActivity {
 //         return jArray;}
 //    }
 
-    private static String readBuffer(Reader rd) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int cp;
-        while ((cp = rd.read()) != -1) {
-            sb.append((char) cp);
-        }
-        return sb.toString();
-    }
-
-    public static JSONObject urlToJSON (String url) throws IOException, JSONException{
-        InputStream is = new URL(url).openStream();
-        try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            return new JSONObject(readBuffer(rd));
-        } finally {
-            is.close();
-        }
-    }
-
     public void sendIntent(){
 
         Intent intent = new Intent();
@@ -151,4 +139,51 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    protected class JsonFromURLTask extends AsyncTask<String, Void, String>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected String doInBackground(String... url) {
+            try {
+                InputStream is = new URL(url[0]).openConnection().getInputStream();
+                try {
+                    BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                    StringBuilder sb = new StringBuilder();
+                    int cp;
+                    while ((cp = rd.read()) != -1) {
+                        if ((char) cp != '\n' || (char) cp != '\t')
+                            sb.append((char) cp);
+                        else
+                            sb.append(' ');
+                    }
+                    MainActivity.JSON_STRING = sb.toString();
+                    is.close();
+                    return MainActivity.JSON_STRING;
+                } finally {
+                    is.close();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Download Failed";
+            }
+
+        }
+
+        protected void onPostExecute(String result) {
+            try {
+                temperatureView.setText(getTemperature(MainActivity.JSON_STRING));
+                realFeelView.setText(getRealFeel(MainActivity.JSON_STRING));
+                dewPointView.setText(getDewPoint(MainActivity.JSON_STRING));
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 }
