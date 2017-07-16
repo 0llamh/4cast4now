@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         dewPointView = (TextView) findViewById(R.id.dewpointNumber);
 
         // TODO: GET STATE & CITY STRING VALUES
-        //state="VA";
-        //city="Fairfax";
 
         getLocation();
 
@@ -158,6 +156,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         JSONObject json = new JSONObject(jsonstring);
         return json.getJSONObject("current_observation").getString("dewpoint_f") + "°";
     }
+    protected String getConditions(String jsonstring) throws JSONException, IOException {
+        // Given State & City, we can hit our API
+        JSONObject json = new JSONObject(jsonstring);
+        return json.getJSONObject("current_observation").getString("weather") + "°";
+    }
 
     public void sendIntent(){
 
@@ -215,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 temperatureView.setText(getTemperature(MainActivity.JSON_STRING));
                 realFeelView.setText(getRealFeel(MainActivity.JSON_STRING));
                 dewPointView.setText(getDewPoint(MainActivity.JSON_STRING));
+                gifView.setGifMovie(getConditions(MainActivity.JSON_STRING));
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
