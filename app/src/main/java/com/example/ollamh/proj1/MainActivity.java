@@ -61,18 +61,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private boolean mLocationPermissionGranted = false;
     public static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
+    public boolean locationFlag=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getLocation();
-        while(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        getLocation();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            locationFlag=true;
+        if (!locationFlag)
+            finish();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

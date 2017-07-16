@@ -23,7 +23,6 @@
 
         </receiver>
         <activity android:name=".MainActivity"
-            android:hardwareAccelerated="false"
             android:largeHeap="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -55,7 +55,7 @@ android:layout_height="match_parent" >
         android:shadowDy="6"
         android:text="90"
         android:shadowRadius=".5"
-        android:layout_marginTop="310dp"
+        android:layout_marginTop="320dp"
         android:layout_alignLeft="@+id/date"
         android:layout_alignStart="@+id/date" />
 
@@ -87,7 +87,7 @@ android:layout_height="match_parent" >
         android:textColor="#cdd4db"
         android:layout_below="@+id/humidity"
         android:layout_alignLeft="@+id/humidity"
-        android:text="90"
+        android:text="90%"
         android:layout_marginRight="17dp"
         android:layout_marginEnd="17dp" />
     <TextView android:id="@+id/realfeel"

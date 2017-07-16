@@ -9,6 +9,7 @@ import android.graphics.Movie;
 import android.os.SystemClock;
 /**
  * Created by Woodham-PC on 7/11/2017.
+ * https://www.youtube.com/watch?v=vZonJM5z_Pc
  */
 
 
@@ -96,19 +97,6 @@ public class GifView extends View{
         movieDuration = gifMovie.duration();
     }
 
-    public int getMovieWidth() {
-        return movieWidth;
-    }
-
-    public int getMovieHeight() {
-        return movieHeight;
-    }
-
-    public long getMovieDuration() {
-        return movieDuration;
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
 
         long now = SystemClock.uptimeMillis();
