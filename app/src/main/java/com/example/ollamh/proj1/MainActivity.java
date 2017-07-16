@@ -76,12 +76,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         dewPointView = (TextView) findViewById(R.id.dewpointNumber);
 
         // TODO: GET STATE & CITY STRING VALUES
-        //state="va";
+        //state="VA";
         //city="Fairfax";
 
         getLocation();
 
-        locationText.setText(city + ", " + state.toUpperCase());
+        locationText.setText(city + ", " + state);
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
         task.execute(new String[] {API_URL});
 
