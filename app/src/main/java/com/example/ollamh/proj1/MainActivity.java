@@ -63,6 +63,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getLocation();
+        while(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        getLocation();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -77,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         // TODO: GET STATE & CITY STRING VALUES
 
-        getLocation();
+
 
         locationText.setText(city + ", " + state);
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
@@ -93,32 +103,34 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            return;
+            //return;
         }
+        else {
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String provider = locationManager.getBestProvider(criteria, true);
-        Location location = locationManager.getLastKnownLocation(provider);
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            String provider = locationManager.getBestProvider(criteria, true);
+            Location location = locationManager.getLastKnownLocation(provider);
 
-        if (location == null) {
-            locationManager.requestLocationUpdates(provider, 1000, 0, this);
-        }
+            if (location == null) {
+                locationManager.requestLocationUpdates(provider, 1000, 0, this);
+            }
 
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
 
-        String cityName = null;
-        Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = gcd.getFromLocation(latitude, longitude, 1);
-            if (addresses.size() > 0)
-                System.out.println(addresses.get(0).getLocality());
-            city = addresses.get(0).getLocality();
-            state = addresses.get(0).getAdminArea();
-        } catch (IOException e) {
-            e.printStackTrace();
+            String cityName = null;
+            Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+            List<Address> addresses;
+            try {
+                addresses = gcd.getFromLocation(latitude, longitude, 1);
+                if (addresses.size() > 0)
+                    System.out.println(addresses.get(0).getLocality());
+                city = addresses.get(0).getLocality();
+                state = addresses.get(0).getAdminArea();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -144,8 +156,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     protected String getTemperature(String jsonstring) throws JSONException, IOException {
         // Given State & City, we can hit our API
         JSONObject json = new JSONObject(jsonstring);
-        return json.getJSONObject("current_observation").getString("temp_f") + "°";
+        String temp = json.getJSONObject("current_observation").getString("temp_f");
+        String intTemp="";
+        for (int i =0; i<temp.length(); i++)
+            if (temp.charAt(i)!='.')
+
+                intTemp+=temp.charAt(i);
+            else
+                break;
+        return intTemp+"°";
+
+        //int i = Integer.parseInt(temp);
+        //return i + "°";
     }
+
+
+
     protected String getRealFeel(String jsonstring) throws JSONException, IOException {
         // Given State & City, we can hit our API
         JSONObject json = new JSONObject(jsonstring);
