@@ -45,7 +45,7 @@ import static android.app.TaskStackBuilder.create;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
     GifView gifView;
-    TextView locationText, dateText, temperatureView, realFeelView, dewPointView;
+    TextView locationText, dateText, temperatureView, realFeelView, dewPointView, humidity;
     String state, city, provider;
     double latitude, longitude;
     Geocoder geocoder;
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         locationText = (TextView) findViewById(R.id.location);
         dateText = (TextView) findViewById(R.id.date);
         realFeelView = (TextView) findViewById(R.id.realfeelNumber);
+        humidity = (TextView) findViewById(R.id.humidityNumber);
         dewPointView = (TextView) findViewById(R.id.dewpointNumber);
 
         // TODO: GET STATE & CITY STRING VALUES
@@ -180,6 +181,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         JSONObject json = new JSONObject(jsonstring);
         return json.getJSONObject("current_observation").getString("dewpoint_f") + "°";
     }
+    protected String getHumidity(String jsonstring) throws JSONException, IOException {
+        // Given State & City, we can hit our API
+        JSONObject json = new JSONObject(jsonstring);
+        return json.getJSONObject("current_observation").getString("relative_humidity");
+    }
     protected String getConditions(String jsonstring) throws JSONException, IOException {
         // Given State & City, we can hit our API
         JSONObject json = new JSONObject(jsonstring);
@@ -242,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 temperatureView.setText(getTemperature(MainActivity.JSON_STRING));
                 realFeelView.setText(getRealFeel(MainActivity.JSON_STRING));
                 dewPointView.setText(getDewPoint(MainActivity.JSON_STRING));
+                humidity.setText(getHumidity(MainActivity.JSON_STRING));
                 gifView.setGifMovie(getConditions(MainActivity.JSON_STRING));
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
