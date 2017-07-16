@@ -40,9 +40,9 @@ public class GifView extends View{
 
     private void init(Context context) {
         setFocusable(true);
-        gifInputStream = context.getResources().openRawResource(+R.drawable.rainy);
-
-        gifMovie = Movie.decodeStream(gifInputStream);
+        //gifInputStream = context.getResources().openRawResource(+R.drawable.rainy);
+        //gifInputStream = setGifMovie(context)
+        //gifMovie = Movie.decodeStream(gifInputStream);
         movieWidth = gifMovie.width();
         movieHeight = gifMovie.height();
         movieDuration = gifMovie.duration();
@@ -51,6 +51,15 @@ public class GifView extends View{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(movieWidth, movieHeight);
+    }
+
+    public InputStream setGifMovie(String condition){
+        InputStream gifInputStream;
+        // switch (condition){
+            // case "weather": gifInputStream = context.getResources(*).openRawResource(+R.drawable.rainy);
+            //          break;
+            // ...
+        // }
     }
 
     public int getMovieWidth() {

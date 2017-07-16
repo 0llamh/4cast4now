@@ -5,7 +5,11 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.icu.util.GregorianCalendar;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
@@ -32,14 +36,17 @@ import android.widget.Toast;
 import static android.app.TaskStackBuilder.create;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener{
     GifView gifView;
     TextView locationText, dateText, temperatureView, realFeelView, dewPointView;
     String state, city;
 
     final private String API_KEY = "3b7b12e3bec57d6c";
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 30; // 30 minute
     private String API_URL;
     private static String JSON_STRING;
+    private Location location;
+    private double latitude, longitude;
 
     NotificationManager notificationManager;
 
@@ -57,10 +64,33 @@ public class MainActivity extends AppCompatActivity {
         realFeelView = (TextView) findViewById(R.id.realfeelNumber);
         dewPointView = (TextView) findViewById(R.id.dewpointNumber);
 
+        boolean gps = false, network = false, loc = false;
 
         // TODO: GET STATE & CITY STRING VALUES
-        state="va";
-        city="Fairfax";
+
+//        try {
+//            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//            gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+//            network = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+//            if (!gps && !network){
+//                // no provider enabled
+//            } else {
+//                loc = true;
+//                if (network){
+//                    location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return location;
+
+        GPSTracker gpsTracker = new GPSTracker(this);
+
+
+
+        state="sc";
+        city="charleston";
         locationText.setText(city + ", " + state.toUpperCase());
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
         task.execute(new String[] {API_URL});
@@ -93,6 +123,11 @@ public class MainActivity extends AppCompatActivity {
         // Given State & City, we can hit our API
         JSONObject json = new JSONObject(jsonstring);
         return json.getJSONObject("current_observation").getString("dewpoint_f") + "°";
+    }
+    protected String getWeatherCondition(String jsonstring) throws JSONException, IOException {
+        // Given State & City, we can hit our API
+        JSONObject json = new JSONObject(jsonstring);
+        return json.getJSONObject("current_observation").getString("weather") + "°";
     }
 
     public void sendIntent(){
@@ -151,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 temperatureView.setText(getTemperature(MainActivity.JSON_STRING));
                 realFeelView.setText(getRealFeel(MainActivity.JSON_STRING));
                 dewPointView.setText(getDewPoint(MainActivity.JSON_STRING));
+                gifView.setGifMovie(getWeatherCondition(MainActivity.JSON_STRING));
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
@@ -158,4 +194,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    @Override
+    public IBinder onBind(Intent arg0) {
+        return null;
+    }
 }
