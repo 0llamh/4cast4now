@@ -170,8 +170,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         //return i + "°";
     }
 
-
-
     protected String getRealFeel(String jsonstring) throws JSONException, IOException {
         // Given State & City, we can hit our API
         JSONObject json = new JSONObject(jsonstring);
@@ -185,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     protected String getConditions(String jsonstring) throws JSONException, IOException {
         // Given State & City, we can hit our API
         JSONObject json = new JSONObject(jsonstring);
-        return json.getJSONObject("current_observation").getString("weather") + "°";
+        return json.getJSONObject("current_observation").getString("weather");
     }
 
     public void sendIntent(){

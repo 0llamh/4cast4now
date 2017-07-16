@@ -88,8 +88,12 @@ public class GifView extends View{
                 break;
             default:
                 gifInputStream = getContext().getResources().openRawResource(+R.drawable.sunny);
+                break;
         }
         gifMovie = Movie.decodeStream(gifInputStream);
+        movieWidth = gifMovie.width();
+        movieHeight = gifMovie.height();
+        movieDuration = gifMovie.duration();
     }
 
     public int getMovieWidth() {
