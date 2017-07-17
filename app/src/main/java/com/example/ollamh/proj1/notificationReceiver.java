@@ -80,10 +80,8 @@ public class notificationReceiver extends BroadcastReceiver {
 
 
     protected String getWeatherAlert(String state, String city) throws JSONException {
-        // Given State & City, we can hit our API
-        API_URL = "http://api.wunderground.com/api/" + API_KEY + "/alerts/q/" + state + "/" + city + ".json"; // + STATE_NAME/CITY_NAME.json"
-
-        JSONObject api = new JSONObject(API_URL);
+        /// Using the JSON STRING from MainActivity, we can search for alerts & conditions
+        JSONObject api = new JSONObject(MainActivity.JSON_STRING);
         severeWeather = api.getJSONObject("alerts").getString("type");
         isAlert = api.getJSONObject("alerts").getInt("alerts");
         description=api.getJSONObject("alerts").getString("message");
@@ -92,10 +90,8 @@ public class notificationReceiver extends BroadcastReceiver {
     }
 
     protected String isRain(String state, String city) throws JSONException {
-        // Given State & City, we can hit our API
-        API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json"; // + STATE_NAME/CITY_NAME.json"
-
-        JSONObject api = new JSONObject(API_URL);
+        // Using the JSON STRING from MainActivity, we can search for alerts & conditions
+        JSONObject api = new JSONObject(MainActivity.JSON_STRING);
         weather = api.getJSONObject("conditions").getString("weather");
             if(weather.contains("Rain")){
                 isRain=true;

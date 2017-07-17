@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     final private String API_KEY = "3b7b12e3bec57d6c";
     private String API_URL;
-    private static String JSON_STRING;
+    public static String JSON_STRING;
 
     LocationManager locationManager;
     public boolean locationFlag=false;
@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             locationFlag=true;
-        if (!locationFlag)
-            finish();
+//        if (!locationFlag)
+//            finish();
         getLocation();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             locationText.setText(city + ", " + state);
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
         task.execute(new String[] {API_URL});
+        Toast.makeText(MainActivity.this, "Downloading Weather Information...", Toast.LENGTH_SHORT).show();
 
         // Get Date & Set TextView accordingly
         dateText.setText(DateFormat.getDateInstance().format(new Date()));
@@ -106,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
         JsonFromURLTask task = new JsonFromURLTask();
         task.execute(new String[] {API_URL});
+        Toast.makeText(MainActivity.this, "Updating Weather Information...", Toast.LENGTH_SHORT).show();
+
 
         dateText.setText(DateFormat.getDateInstance().format(new Date()));
 
@@ -247,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                     }
                     MainActivity.JSON_STRING = sb.toString();
                     is.close();
-                    Toast.makeText(MainActivity.this, "Downloading Weather Information...", Toast.LENGTH_LONG).show();
                     return MainActivity.JSON_STRING;
                 } finally {
                     is.close();
