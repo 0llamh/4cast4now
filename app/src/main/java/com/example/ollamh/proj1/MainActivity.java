@@ -47,21 +47,14 @@ import static android.app.TaskStackBuilder.create;
 public class MainActivity extends AppCompatActivity implements LocationListener{
     GifView gifView;
     TextView locationText, dateText, temperatureView, realFeelView, dewPointView, humidity;
-    String state, city, provider;
+    String state, city;
     double latitude, longitude;
-    Geocoder geocoder;
 
     final private String API_KEY = "3b7b12e3bec57d6c";
     private String API_URL;
     private static String JSON_STRING;
-    String bestProvider;
 
-    NotificationManager notificationManager;
     LocationManager locationManager;
-    Location location;
-    private boolean mLocationPermissionGranted = false;
-    public static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-
     public boolean locationFlag=false;
 
     @Override
@@ -69,14 +62,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             locationFlag=true;
-        //if (!locationFlag)
-           // finish();
+        if (!locationFlag)
+            finish();
         getLocation();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         JsonFromURLTask task = new JsonFromURLTask();
-
         gifView = (GifView) findViewById(R.id.gef_view);
         temperatureView = (TextView) findViewById(R.id.temperature);
         locationText = (TextView) findViewById(R.id.location);
@@ -99,6 +91,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         sendIntent();
     }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        getLocation();
+        if(city!=null && state!=null)
+            locationText.setText(city + ", " + state);
+        API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
+        JsonFromURLTask task = new JsonFromURLTask();
+        task.execute(new String[] {API_URL});
+
+        dateText.setText(DateFormat.getDateInstance().format(new Date()));
+
+    }
+
     public void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -112,25 +124,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 String provider = locationManager.getBestProvider(criteria, true);
                 Location location = locationManager.getLastKnownLocation(provider);
 
-                if (location == null) {
-                    locationManager.requestLocationUpdates(provider, 1000, 0, this);
-                }
-
+                locationManager.requestLocationUpdates(provider, 1000, 0, this);
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
 
                 Log.d("latitude", latitude + "");
                 Log.d("longitude", longitude + "");
 
-                String cityName = null;
                 Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
                 List<Address> addresses;
                 try {
                     addresses = gcd.getFromLocation(latitude, longitude, 1);
                     if (addresses.size() > 0)
-                        System.out.println(addresses.get(0).getLocality());
+                        Log.d("address[0].getLocality:", addresses.get(0).getLocality());
                     city = addresses.get(0).getLocality();
                     state = addresses.get(0).getAdminArea();
+                    addresses.clear();
                     Log.d("City", city);
                     Log.d("State", state);
                 } catch (IOException e) {
@@ -238,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                     }
                     MainActivity.JSON_STRING = sb.toString();
                     is.close();
+                    Toast.makeText(MainActivity.this, "Downloading Weather Information...", Toast.LENGTH_LONG).show();
                     return MainActivity.JSON_STRING;
                 } finally {
                     is.close();
