@@ -54,18 +54,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private String API_URL;
     private static String JSON_STRING;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-
-    LocationManager locationManager;
-    Location location;
-    private boolean mLocationPermissionGranted = false;
-    public static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
->>>>>>> 6927781df802e99d72ada66f2ec55ff4e6758f57
-
->>>>>>> 6927781df802e99d72ada66f2ec55ff4e6758f57
     LocationManager locationManager;
     public boolean locationFlag=false;
 
@@ -286,3 +274,4 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     }
 
 }
+
