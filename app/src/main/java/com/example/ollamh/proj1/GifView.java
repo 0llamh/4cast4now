@@ -1,7 +1,9 @@
 package com.example.ollamh.proj1;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import java.io.InputStream;
 import android.graphics.Canvas;
@@ -23,25 +25,14 @@ public class GifView extends View{
     private long movieDuration;
     private long movieStart;
 
-    public GifView(Context context) {
-        super(context);
-        init(context);
-    }
-
-
     public GifView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public GifView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context);
-    }
-
     private void init(Context context) {
         setFocusable(true);
-        gifInputStream = getContext().getResources().openRawResource(+R.drawable.sunny);
+        gifInputStream = getContext().getResources().openRawResource(+R.drawable.rainy);
         gifMovie = Movie.decodeStream(gifInputStream);
         movieWidth = gifMovie.width();
         movieHeight = gifMovie.height();
@@ -98,7 +89,7 @@ public class GifView extends View{
     }
 
     protected void onDraw(Canvas canvas) {
-
+        Log.d("width", Resources.getSystem().getDisplayMetrics().widthPixels +"");
         long now = SystemClock.uptimeMillis();
 
         if(movieStart == 0) {

@@ -21,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.content.Intent;
 
@@ -65,12 +66,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getLocation();
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             locationFlag=true;
-        if (!locationFlag)
-            finish();
+        //if (!locationFlag)
+           // finish();
+        getLocation();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -87,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         // TODO: GET STATE & CITY STRING VALUES
 
 
-
-        locationText.setText(city + ", " + state);
+        if(city!=null && state!=null)
+            locationText.setText(city + ", " + state);
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
         task.execute(new String[] {API_URL});
 
@@ -98,37 +99,45 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         sendIntent();
     }
 
-    public void getLocation(){
+    public void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             //return;
-        }
-        else {
-
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            String provider = locationManager.getBestProvider(criteria, true);
-            Location location = locationManager.getLastKnownLocation(provider);
-
-            if (location == null) {
-                locationManager.requestLocationUpdates(provider, 1000, 0, this);
-            }
-
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-
-            String cityName = null;
-            Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
-            List<Address> addresses;
+        } else {
             try {
-                addresses = gcd.getFromLocation(latitude, longitude, 1);
-                if (addresses.size() > 0)
-                    System.out.println(addresses.get(0).getLocality());
-                city = addresses.get(0).getLocality();
-                state = addresses.get(0).getAdminArea();
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                String provider = locationManager.getBestProvider(criteria, true);
+                Location location = locationManager.getLastKnownLocation(provider);
+
+                if (location == null) {
+                    locationManager.requestLocationUpdates(provider, 1000, 0, this);
+                }
+
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+
+                Log.d("latitude", latitude + "");
+                Log.d("longitude", longitude + "");
+
+                String cityName = null;
+                Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+                List<Address> addresses;
+                try {
+                    addresses = gcd.getFromLocation(latitude, longitude, 1);
+                    if (addresses.size() > 0)
+                        System.out.println(addresses.get(0).getLocality());
+                    city = addresses.get(0).getLocality();
+                    state = addresses.get(0).getAdminArea();
+                    Log.d("City", city);
+                    Log.d("State", state);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (Exception ex) {
+                Toast.makeText(this, "Please Turn on Location Services and Restart App", Toast.LENGTH_LONG).show();
             }
         }
     }
