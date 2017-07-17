@@ -54,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private String API_URL;
     private static String JSON_STRING;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6927781df802e99d72ada66f2ec55ff4e6758f57
     LocationManager locationManager;
     public boolean locationFlag=false;
 
