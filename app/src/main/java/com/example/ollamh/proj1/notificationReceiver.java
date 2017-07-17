@@ -24,6 +24,8 @@ public class notificationReceiver extends BroadcastReceiver {
     private String severeWeather = "Severe Weather Alert";
     private int isAlert= 0;
     private String description="";
+    private String weather="";
+    private boolean isRain=false;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -36,6 +38,27 @@ public class notificationReceiver extends BroadcastReceiver {
             severeWeather=getWeatherAlert(state, city);
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+        try {
+            weather=isRain(state, city);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(isRain==true){
+            NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                    .setContentTitle("It's Raining!")
+                    .setContentText("Don't Forget Your Umbrella! ")
+                    .setTicker("It's Raining!")
+                    .setSmallIcon(R.drawable.ic_stat_name);
+
+            notificationBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
+            notificationBuilder.setAutoCancel(true);
+
+            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.notify(1, notificationBuilder.build());
+
         }
 
         if(isAlert>0) {
@@ -65,6 +88,25 @@ public class notificationReceiver extends BroadcastReceiver {
         isAlert = api.getJSONObject("alerts").getInt("alerts");
         description=api.getJSONObject("alerts").getString("message");
         return api.getJSONObject("alerts").getString("type");
+
+    }
+
+    protected String isRain(String state, String city) throws JSONException {
+        // Given State & City, we can hit our API
+        API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json"; // + STATE_NAME/CITY_NAME.json"
+
+        JSONObject api = new JSONObject(API_URL);
+        weather = api.getJSONObject("conditions").getString("weather");
+            if(weather.contains("Rain")){
+                isRain=true;
+            }
+            if(weather.contains("Drizzle")){
+                isRain=true;
+            }
+            if(weather.contains("Thunderstorm")){
+                isRain=true;
+            }
+        return api.getJSONObject("conditions").getString("weather");
 
     }
 

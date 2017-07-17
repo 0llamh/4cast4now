@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private static String JSON_STRING;
     String bestProvider;
 
-    NotificationManager notificationManager;
+
     LocationManager locationManager;
     Location location;
     private boolean mLocationPermissionGranted = false;
