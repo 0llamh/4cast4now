@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     LocationManager locationManager;
     public boolean locationFlag=false;
+    public boolean firstrun=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             locationFlag=true;
 //        if (!locationFlag)
 //            finish();
-        getLocation();
+        //getLocation();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -84,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             locationText.setText(city + ", " + state);
         API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
         task.execute(new String[] {API_URL});
-        Toast.makeText(MainActivity.this, "Downloading Weather Information...", Toast.LENGTH_SHORT).show();
 
         // Get Date & Set TextView accordingly
         dateText.setText(DateFormat.getDateInstance().format(new Date()));
@@ -93,25 +94,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     }
 
     @Override
-    protected void onPause(){
+    public void onPause(){
         super.onPause();
     }
 
     @Override
     protected void onResume(){
-        super.onResume();
 
-        getLocation();
-        if(city!=null && state!=null)
-            locationText.setText(city + ", " + state);
-        API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
-        JsonFromURLTask task = new JsonFromURLTask();
-        task.execute(new String[] {API_URL});
-        Toast.makeText(MainActivity.this, "Updating Weather Information...", Toast.LENGTH_SHORT).show();
+                    super.onResume();
 
-        dateText.setText(DateFormat.getDateInstance().format(new Date()));
+                    getLocation();
+                    if (city != null && state != null)
+                        locationText.setText(city + ", " + state);
+                    API_URL = "http://api.wunderground.com/api/" + API_KEY + "/conditions/q/" + state + "/" + city + ".json";
+                    JsonFromURLTask task = new JsonFromURLTask();
+                    task.execute(new String[]{API_URL});
+
+                    dateText.setText(DateFormat.getDateInstance().format(new Date()));
+
 
     }
+
+
 
     public void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -148,8 +152,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                     e.printStackTrace();
                 }
             } catch (Exception ex) {
-                Toast.makeText(this, "Please Turn on Location Services and Restart App", Toast.LENGTH_LONG).show();
+                FragmentManager fm = getSupportFragmentManager();
+                NoLocationFragment dwn = new NoLocationFragment();
+                dwn.show(fm, "No Location");
+
             }
+
         }
     }
 
