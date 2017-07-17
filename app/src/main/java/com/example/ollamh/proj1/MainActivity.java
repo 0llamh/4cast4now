@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         task.execute(new String[] {API_URL});
         Toast.makeText(MainActivity.this, "Updating Weather Information...", Toast.LENGTH_SHORT).show();
 
-
         dateText.setText(DateFormat.getDateInstance().format(new Date()));
 
     }
@@ -180,14 +179,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         String intTemp="";
         for (int i =0; i<temp.length(); i++)
             if (temp.charAt(i)!='.')
-
                 intTemp+=temp.charAt(i);
             else
                 break;
         return intTemp+"°";
-
-        //int i = Integer.parseInt(temp);
-        //return i + "°";
     }
 
     protected String getRealFeel(String jsonstring) throws JSONException, IOException {
@@ -224,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         AlarmManager interval = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
         interval.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-
 
     }
 
